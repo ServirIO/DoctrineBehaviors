@@ -121,7 +121,7 @@ class BlameableListener extends AbstractListener
                 'fieldName'    => 'createdBy',
                 'targetEntity' => $this->userEntity,
                 'joinColumns'  => array(array(
-                    'onDelete'             => 'SET NULL'
+                    // 'onDelete'             => 'SET NULL'
                 ))
             ]);
         }
@@ -130,7 +130,7 @@ class BlameableListener extends AbstractListener
                 'fieldName'    => 'updatedBy',
                 'targetEntity' => $this->userEntity,
                 'joinColumns'  => array(array(
-                    'onDelete'             => 'SET NULL'
+                    // 'onDelete'             => 'SET NULL'
                 ))
             ]);
         }
@@ -139,7 +139,7 @@ class BlameableListener extends AbstractListener
                 'fieldName'    => 'deletedBy',
                 'targetEntity' => $this->userEntity,
                 'joinColumns'  => array(array(
-                    'onDelete'             => 'SET NULL'
+                    // 'onDelete'             => 'SET NULL'
                 ))
             ]);
         }
@@ -164,9 +164,9 @@ class BlameableListener extends AbstractListener
                     $entity->setCreatedBy($user);
 
                     $uow->propertyChanged($entity, 'createdBy', null, $user);
-                    $uow->scheduleExtraUpdate($entity, [
-                        'createdBy' => [null,  $user],
-                    ]);
+                    // $uow->scheduleExtraUpdate($entity, [
+                    //     'createdBy' => [null,  $user],
+                    // ]);
                 }
             }
             if (!$entity->getUpdatedBy()) {
@@ -175,9 +175,9 @@ class BlameableListener extends AbstractListener
                     $entity->setUpdatedBy($user);
                     $uow->propertyChanged($entity, 'updatedBy', null, $user);
 
-                    $uow->scheduleExtraUpdate($entity, [
-                        'updatedBy' => [null, $user],
-                    ]);
+                    // $uow->scheduleExtraUpdate($entity, [
+                    //     'updatedBy' => [null, $user],
+                    // ]);
                 }
             }
         }
@@ -221,9 +221,9 @@ class BlameableListener extends AbstractListener
                 $entity->setUpdatedBy($user);
                 $uow->propertyChanged($entity, 'updatedBy', $oldValue, $user);
 
-                $uow->scheduleExtraUpdate($entity, [
-                    'updatedBy' => [$oldValue, $user],
-                ]);
+                // $uow->scheduleExtraUpdate($entity, [
+                //     'updatedBy' => [$oldValue, $user],
+                // ]);
             }
         }
     }
@@ -250,9 +250,9 @@ class BlameableListener extends AbstractListener
                 $entity->setDeletedBy($user);
                 $uow->propertyChanged($entity, 'deletedBy', $oldValue, $user);
 
-                $uow->scheduleExtraUpdate($entity, [
-                    'deletedBy' => [$oldValue, $user],
-                ]);
+                // $uow->scheduleExtraUpdate($entity, [
+                //     'deletedBy' => [$oldValue, $user],
+                // ]);
             }
         }
     }
