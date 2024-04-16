@@ -47,10 +47,12 @@ final class BlameableEventSubscriber implements EventSubscriber
     private $entityManager;
 
     public function __construct(
+        \Doctrine\Persistence\ManagerRegistry $registry,
         UserProviderInterface $userProvider,
         EntityManagerInterface $entityManager,
         ?string $blameableUserEntity = null
     ) {
+        $this->registry = $registry;
         $this->userProvider = $userProvider;
         $this->entityManager = $entityManager;
         $this->blameableUserEntity = $blameableUserEntity;
@@ -93,14 +95,14 @@ final class BlameableEventSubscriber implements EventSubscriber
         if (! $entity->getCreatedBy()) {
             $entity->setCreatedBy($user);
 
-            $this->getUnitOfWork()
+            $this->getUnitOfWork($entity)
                 ->propertyChanged($entity, self::CREATED_BY, null, $user);
         }
 
         if (! $entity->getUpdatedBy()) {
             $entity->setUpdatedBy($user);
 
-            $this->getUnitOfWork()
+            $this->getUnitOfWork($entity)
                 ->propertyChanged($entity, self::UPDATED_BY, null, $user);
         }
     }
@@ -123,7 +125,7 @@ final class BlameableEventSubscriber implements EventSubscriber
         $oldValue = $entity->getUpdatedBy();
         $entity->setUpdatedBy($user);
 
-        $this->getUnitOfWork()
+        $this->getUnitOfWork($entity)
             ->propertyChanged($entity, self::UPDATED_BY, $oldValue, $user);
     }
 
@@ -145,7 +147,7 @@ final class BlameableEventSubscriber implements EventSubscriber
         $oldValue = $entity->getDeletedBy();
         $entity->setDeletedBy($user);
 
-        $this->getUnitOfWork()
+        $this->getUnitOfWork($entity)
             ->propertyChanged($entity, self::DELETED_BY, $oldValue, $user);
     }
 
@@ -163,9 +165,18 @@ final class BlameableEventSubscriber implements EventSubscriber
         }
     }
 
-    private function getUnitOfWork(): UnitOfWork
+    private function getUnitOfWork($entity): UnitOfWork
     {
-        return $this->entityManager->getUnitOfWork();
+        $entityManager = $this->registry->getManagerForClass(get_class($entity));
+
+        if (null === $entityManager) {
+            throw new \LogicException(sprintf(
+                'No entity manager found for class \'%s\'.',
+                get_class($entity)
+            ));
+        }
+
+        return $entityManager->getUnitOfWork();
     }
 
     private function mapManyToOneUser(ClassMetadataInfo $classMetadataInfo): void
